@@ -9,7 +9,7 @@ import {
   type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 
-// Projects can be a "supply" (New Project / Supply and Installation), "maintenance" or "amc".
+// Projects can be a "supply" (Supply & Installation), "maintenance" or "amc".
 export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
   type: text("type").notNull(),
@@ -18,7 +18,6 @@ export const projects = pgTable("projects", {
   location: text("location").notNull().default(""),
   contractDate: date("contract_date").notNull(),
   status: text("status").notNull().default("active"),
-  shopDrawingStatus: text("shop_drawing_status").notNull().default("pending"),
   progress: integer("progress").notNull().default(0),
   tasks: jsonb("tasks").$type<{ key: string; label: string }[]>().notNull().default([]),
   completedTasks: jsonb("completed_tasks").$type<string[]>().notNull().default([]),

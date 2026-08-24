@@ -3,22 +3,42 @@ import { Pool } from "pg";
 
 const databaseUrl = process.env.DATABASE_URL;
 
-if (!databaseUrl) {
-  throw new Error("DATABASE_URL is required");
-}
-
 const globalForDb = globalThis as typeof globalThis & {
   __arenaNextJsPostgresqlPool?: Pool;
 };
 
-export const pool =
-  globalForDb.__arenaNextJsPostgresqlPool ??
-  new Pool({
-    connectionString: databaseUrl,
-  });
+export const pool: Pool | undefined = databaseUrl
+  ? (globalForDb.__arenaNextJsPostgresqlPool ??
+      new Pool({
+        connectionString: databaseUrl,
+      }))
+  : undefined;
 
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== "production" && pool) {
   globalForDb.__arenaNextJsPostgresqlPool = pool;
 }
 
-export const db = drizzle(pool);
+const configuredDb = pool ? drizzle(pool) : undefined;
+
+type DbClient = NonNullable<typeof configuredDb>;
+
+function missingDatabaseUrlError() {
+  return new Error(
+    "DATABASE_URL is required. Add a PostgreSQL connection string to your deployment environment variables."
+  );
+}
+
+export function isDatabaseConfigured() {
+  return Boolean(databaseUrl);
+}
+
+export const db: DbClient =
+  configuredDb ??
+  (new Proxy(
+    {},
+    {
+      get() {
+        throw missingDatabaseUrlError();
+      },
+    }
+  ) as DbClient);

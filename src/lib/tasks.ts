@@ -13,24 +13,14 @@ export const DEFAULT_SUPPLY_TASKS: Task[] = [
 ];
 
 export const PROJECT_TYPES = [
-  { value: "supply", label: "New Project — Supply and Installation" },
+  { value: "supply", label: "Supply & Installation" },
   { value: "maintenance", label: "Maintenance" },
   { value: "amc", label: "AMC" },
 ] as const;
 
 export const PROJECT_STATUSES = ["active", "pending", "completed", "on_hold"] as const;
 
-export const SHOP_DRAWING_STATUSES = [
-  "pending",
-  "in_progress",
-  "submitted",
-  "approved",
-  "revision_required",
-  "not_required",
-] as const;
-
 export type ProjectStatus = (typeof PROJECT_STATUSES)[number];
-export type ShopDrawingStatus = (typeof SHOP_DRAWING_STATUSES)[number];
 
 export function statusLabel(status: string): string {
   const map: Record<string, string> = {
@@ -38,19 +28,6 @@ export function statusLabel(status: string): string {
     pending: "Pending",
     completed: "Completed",
     on_hold: "On Hold",
-    complete: "Complete",
-  };
-  return map[status] ?? status;
-}
-
-export function shopDrawingStatusLabel(status: string): string {
-  const map: Record<string, string> = {
-    pending: "Pending",
-    in_progress: "In Progress",
-    submitted: "Submitted",
-    approved: "Approved",
-    revision_required: "Revision Required",
-    not_required: "Not Required",
   };
   return map[status] ?? status;
 }

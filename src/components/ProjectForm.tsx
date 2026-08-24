@@ -1,15 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CalendarCheck, FileText, MapPin, User } from "lucide-react";
+import { CalendarCheck, MapPin, User } from "lucide-react";
 import ProgressBar from "./ProgressBar";
 import TaskChecklist from "./TaskChecklist";
 import {
   DEFAULT_SUPPLY_TASKS,
   PROJECT_STATUSES,
-  SHOP_DRAWING_STATUSES,
   statusLabel,
-  shopDrawingStatusLabel,
   computeProgress,
   type Task,
 } from "@/lib/tasks";
@@ -22,7 +20,6 @@ export type ProjectFormData = {
   location: string;
   contractDate: string;
   status: string;
-  shopDrawingStatus: string;
   notes: string;
   tasks: Task[];
   completedTasks: string[];
@@ -60,9 +57,6 @@ export default function ProjectForm({
   const [location, setLocation] = useState(project?.location ?? "");
   const [contractDate, setContractDate] = useState(project?.contractDate ?? todayISO());
   const [status, setStatus] = useState(project?.status ?? "active");
-  const [shopDrawingStatus, setShopDrawingStatus] = useState(
-    project?.shopDrawingStatus ?? "pending"
-  );
   const [notes, setNotes] = useState(project?.notes ?? "");
   const [parentProjectId, setParentProjectId] = useState<number | null>(
     project?.parentProjectId ?? null
@@ -97,7 +91,6 @@ export default function ProjectForm({
       location: location.trim(),
       contractDate,
       status,
-      shopDrawingStatus,
       notes: notes.trim(),
       tasks,
       completedTasks,
@@ -172,25 +165,6 @@ export default function ProjectForm({
             ))}
           </select>
         </div>
-
-        {type === "supply" && (
-          <div className="sm:col-span-2">
-            <label className="mb-1 flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-[#2E2E2E]">
-              <FileText className="h-3 w-3" /> Shop Drawings Status
-            </label>
-            <select
-              value={shopDrawingStatus}
-              onChange={(e) => setShopDrawingStatus(e.target.value)}
-              className={inputCls}
-            >
-              {SHOP_DRAWING_STATUSES.map((s) => (
-                <option key={s} value={s}>
-                  {shopDrawingStatusLabel(s)}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
 
         {type === "amc" && (
           <div className="sm:col-span-2">

@@ -12,16 +12,13 @@ import {
   CalendarCheck,
   ListChecks,
   ExternalLink,
-  FileText,
 } from "lucide-react";
 import Modal from "./Modal";
 import ProjectForm, { type ProjectFormData } from "./ProjectForm";
 import ProgressBar from "./ProgressBar";
 import StatusBadge from "./StatusBadge";
-import ShopDrawingBadge from "./ShopDrawingBadge";
 import TaskChecklist from "./TaskChecklist";
 import { formatDate } from "@/lib/dates";
-import { shopDrawingStatusLabel } from "@/lib/tasks";
 import type { Project } from "@/db/schema";
 import type { Task } from "@/lib/tasks";
 
@@ -30,7 +27,6 @@ type Patch = Partial<{
   clientName: string;
   location: string;
   status: string;
-  shopDrawingStatus: string;
   notes: string;
   tasks: Task[];
   completedTasks: string[];
@@ -40,12 +36,11 @@ export default function ProjectManager({
   type,
   title,
   subtitle,
-  description,
 }: {
   type: "supply" | "maintenance";
   title: string;
   subtitle: string;
-  description?: string;
+  accent?: "brand" | "dark";
 }) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,9 +50,6 @@ export default function ProjectManager({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
-
-  const supplyTableColSpan = 8;
-  const maintenanceTableColSpan = 6;
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -148,8 +140,7 @@ export default function ProjectManager({
     return (
       p.name.toLowerCase().includes(q) ||
       p.clientName.toLowerCase().includes(q) ||
-      p.location.toLowerCase().includes(q) ||
-      shopDrawingStatusLabel(p.shopDrawingStatus).toLowerCase().includes(q)
+      p.location.toLowerCase().includes(q)
     );
   });
 
@@ -168,26 +159,17 @@ export default function ProjectManager({
 
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[#111111] sm:text-3xl">
-            {title}
-          </h1>
-          {type === "supply" ? (
-            <>
-              <p className="mt-1 text-base font-semibold text-[#F7941D]">{subtitle}</p>
-              {description && <p className="mt-1 max-w-3xl text-sm text-[#6B6B6B]">{description}</p>}
-            </>
-          ) : (
-            <p className="mt-1 max-w-3xl text-sm text-[#6B6B6B]">{subtitle}</p>
-          )}
+          <h1 className="text-2xl font-bold tracking-tight text-[#111111]">{title}</h1>
+          <p className="mt-1 text-sm text-[#6B6B6B]">{subtitle}</p>
         </div>
-        <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto lg:items-center">
-          <div className="relative w-full sm:w-64">
+        <div className="flex items-center gap-3">
+          <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#A3A3A3]" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search projects…"
-              className="w-full rounded-xl border border-[#E5E5E5] bg-white py-2.5 pl-9 pr-3 text-sm outline-none placeholder:text-[#A3A3A3] focus:border-[#F7941D] focus:ring-2 focus:ring-[#F7941D]/20"
+              className="w-64 rounded-xl border border-[#E5E5E5] bg-white py-2.5 pl-9 pr-3 text-sm outline-none placeholder:text-[#A3A3A3] focus:border-[#F7941D] focus:ring-2 focus:ring-[#F7941D]/20"
             />
           </div>
           <button
@@ -195,17 +177,17 @@ export default function ProjectManager({
               setEditing(null);
               setModalOpen(true);
             }}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#F7941D] px-4 py-2.5 text-sm font-semibold text-[#111111] shadow-sm hover:bg-[#FFB347]"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#F7941D] px-4 py-2.5 text-sm font-semibold text-[#111111] shadow-sm hover:bg-[#FFB347]"
           >
             <Plus className="h-4 w-4" /> New Project
           </button>
         </div>
       </div>
 
-      <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="mb-6 flex flex-wrap gap-3">
         <div className="rounded-xl border border-[#E5E5E5] bg-white px-5 py-3">
           <p className="text-xs font-semibold uppercase tracking-wide text-[#6B6B6B]">
-            Total {type === "supply" ? "New Projects" : "Maintenance Projects"}
+            Total {type === "supply" ? "Installation" : "Maintenance"} Projects
           </p>
           <p className="mt-1 text-2xl font-bold text-[#111111]">{projects.length}</p>
         </div>
@@ -234,7 +216,7 @@ export default function ProjectManager({
 
       <div className="overflow-hidden rounded-2xl border border-[#E5E5E5] bg-white shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[980px] text-left text-sm">
+          <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-[#E5E5E5] bg-[#F5F5F5] text-xs uppercase tracking-wide text-[#2E2E2E]">
                 <th className="px-5 py-3 font-semibold">Project</th>
@@ -242,9 +224,6 @@ export default function ProjectManager({
                 <th className="px-5 py-3 font-semibold">Location</th>
                 <th className="px-5 py-3 font-semibold">Contract</th>
                 <th className="px-5 py-3 font-semibold">Status</th>
-                {type === "supply" && (
-                  <th className="px-5 py-3 font-semibold">Shop Drawings</th>
-                )}
                 {type === "supply" && (
                   <th className="px-5 py-3 font-semibold">Progress</th>
                 )}
@@ -255,20 +234,14 @@ export default function ProjectManager({
               {loading ? (
                 Array.from({ length: 4 }).map((_, i) => (
                   <tr key={i} className="animate-pulse">
-                    <td
-                      colSpan={type === "supply" ? supplyTableColSpan : maintenanceTableColSpan}
-                      className="px-5 py-4"
-                    >
+                    <td colSpan={type === "supply" ? 7 : 6} className="px-5 py-4">
                       <div className="h-5 w-full rounded bg-[#F5F5F5]" />
                     </td>
                   </tr>
                 ))
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan={type === "supply" ? supplyTableColSpan : maintenanceTableColSpan}
-                    className="px-5 py-12 text-center"
-                  >
+                  <td colSpan={type === "supply" ? 7 : 6} className="px-5 py-12 text-center">
                     <p className="text-3xl">🚒</p>
                     <p className="mt-2 font-semibold text-[#111111]">No projects found</p>
                     <p className="mt-1 text-sm text-[#6B6B6B]">
@@ -286,7 +259,7 @@ export default function ProjectManager({
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[#111111] text-[11px] font-bold text-white">
-                          {type === "supply" ? "NP" : "MT"}
+                          {type === "supply" ? "SI" : "MT"}
                         </span>
                         <div>
                           <p className="font-medium leading-tight text-[#111111] group-hover:text-[#F7941D]">
@@ -305,11 +278,6 @@ export default function ProjectManager({
                     <td className="px-5 py-4">
                       <StatusBadge status={p.status} />
                     </td>
-                    {type === "supply" && (
-                      <td className="px-5 py-4">
-                        <ShopDrawingBadge status={p.shopDrawingStatus} />
-                      </td>
-                    )}
                     {type === "supply" && (
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
@@ -365,6 +333,7 @@ export default function ProjectManager({
         </div>
       </div>
 
+      {/* Detail popup - card view */}
       <Modal
         open={!!detail}
         onClose={() => setDetail(null)}
@@ -387,13 +356,6 @@ export default function ProjectManager({
                   <CalendarCheck className="h-4 w-4 text-[#F7941D]" />
                   <span className="font-medium text-[#111111]">Contract:</span> {formatDate(detail.contractDate)}
                 </p>
-                {type === "supply" && (
-                  <p className="flex items-center gap-2 text-[#2E2E2E]">
-                    <FileText className="h-4 w-4 text-[#F7941D]" />
-                    <span className="font-medium text-[#111111]">Shop Drawings:</span>
-                    <ShopDrawingBadge status={detail.shopDrawingStatus} />
-                  </p>
-                )}
               </div>
               <StatusBadge status={detail.status} />
             </div>
@@ -438,7 +400,7 @@ export default function ProjectManager({
               </div>
             )}
 
-            <div className="flex flex-col gap-2 border-t border-[#F0F0F0] pt-4 sm:flex-row">
+            <div className="flex gap-2 border-t border-[#F0F0F0] pt-4">
               <button
                 onClick={() => {
                   setEditing(detail);
@@ -459,9 +421,9 @@ export default function ProjectManager({
               </button>
               <button
                 onClick={() => setDetail(null)}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#E5E5E5] bg-white px-4 py-2.5 text-sm font-semibold text-[#6B6B6B] hover:bg-[#F5F5F5] sm:w-10 sm:px-0"
+                className="grid h-10 w-10 place-items-center rounded-xl border border-[#E5E5E5] bg-white text-[#6B6B6B] hover:bg-[#F5F5F5]"
               >
-                <X className="h-4 w-4" /> <span className="sm:hidden">Close</span>
+                <X className="h-4 w-4" />
               </button>
             </div>
           </div>

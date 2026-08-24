@@ -36,15 +36,7 @@ export async function PATCH(req: Request, { params }: Ctx) {
   const current = rows[0];
 
   const updates: Record<string, unknown> = {};
-  const scalarFields = [
-    "name",
-    "clientName",
-    "location",
-    "status",
-    "shopDrawingStatus",
-    "notes",
-    "parentProjectId",
-  ];
+  const scalarFields = ["name", "clientName", "location", "status", "notes", "parentProjectId"];
   for (const f of scalarFields) {
     if (f in body) updates[f] = body[f];
   }

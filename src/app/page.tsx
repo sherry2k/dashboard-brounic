@@ -19,7 +19,7 @@ import { formatDate, daysUntil } from "@/lib/dates";
 export const dynamic = "force-dynamic";
 
 const TYPE_LABEL: Record<string, string> = {
-  supply: "New Project — Supply and Installation",
+  supply: "Supply & Installation",
   maintenance: "Maintenance",
   amc: "AMC",
 };
@@ -105,8 +105,7 @@ export default async function OverviewPage() {
             <ArrowUpRight className="h-5 w-5 text-[#D4D4D4] transition-colors group-hover:text-[#F7941D]" />
           </div>
           <p className="mt-4 text-3xl font-bold text-[#111111]">{supply.length}</p>
-          <p className="text-sm font-semibold text-[#111111]">New Project</p>
-          <p className="text-xs font-medium text-[#6B6B6B]">Supply and Installation</p>
+          <p className="text-sm font-medium text-[#6B6B6B]">Supply &amp; Installation</p>
           <div className="mt-2 flex items-center gap-2">
             <div className="flex-1">
               <ProgressBar value={avgSupply} color="brand" size="sm" />
@@ -257,8 +256,7 @@ export default async function OverviewPage() {
           </p>
         </div>
         <div className="rounded-2xl border border-[#E5E5E5] bg-white p-5 shadow-sm">
-          <p className="text-sm font-semibold text-[#111111]">New Project</p>
-          <p className="text-xs font-medium text-[#6B6B6B]">Supply and Installation</p>
+          <p className="text-sm font-medium text-[#6B6B6B]">Supply &amp; Installation</p>
           <p className="mt-2 text-2xl font-bold text-[#111111]">{avgSupply}%</p>
           <p className="text-xs text-[#6B6B6B]">average progress across projects</p>
         </div>

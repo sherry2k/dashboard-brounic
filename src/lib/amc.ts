@@ -10,8 +10,9 @@ export type GeneratedVisit = {
 
 /**
  * An AMC contract is serviced 4 times a year (every ~3 months) from the
- * contract date. A visit is automatically marked complete once its scheduled
- * date has passed.
+ * contract date. A visit is automatically marked "complete" once its scheduled
+ * date has passed. For a contract that is >= 6 months old the first two visits
+ * therefore show as complete.
  */
 export function generateAmcVisits(contractDate: string): GeneratedVisit[] {
   const visits: GeneratedVisit[] = [];
